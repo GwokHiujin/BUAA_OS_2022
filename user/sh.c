@@ -77,20 +77,6 @@ gettoken(char *s, char **p1) {
     return c;
 }
 
-static int run_time;
-static char testname[64];
-
-void do_in_cmd() {
-	if (testname[0]) {
-		writef("%s	%d\n", testname, run_time);	
-	} else {
-		run_time++;
-		writef("run_time is %d\n", run_time);
-		if (run_time == 1) {
-			strcpy(testname, "test");	
-		}
-	}
-}
 
 #define MAXARGS 16
 
@@ -111,13 +97,7 @@ runcmd(char *s) {
         c = gettoken(0, &t);
         switch (c) {
             case 0:
-				if (strcmp(argv[0], "test") == 0) {
-					do_in_cmd();	
-					return;
-				}
-                else {
-					goto runit;
-				}
+		goto runit;
             case 'w':
                 if (argc == MAXARGS) {
                     writef("too many arguments\n");
