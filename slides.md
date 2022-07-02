@@ -7,7 +7,7 @@ class: 'text-center'
 highlighter: shiki
 # show line numbers in code blocks
 lineNumbers: true
-download: truet
+download: true
 
 exportFilename: Report_lab6_challenge.pdf
 remoteAssets: false
