@@ -77,6 +77,20 @@ gettoken(char *s, char **p1) {
     return c;
 }
 
+static int run_time;
+static char testname[64];
+
+void do_in_cmd() {
+	if (testname[0]) {
+		writef("%s	%d\n", testname, run_time);	
+	} else {
+		run_time++;
+		writef("run_time is %d\n", run_time);
+		if (run_time == 1) {
+			strcpy(testname, "test");	
+		}
+	}
+}
 
 #define MAXARGS 16
 
@@ -97,7 +111,13 @@ runcmd(char *s) {
         c = gettoken(0, &t);
         switch (c) {
             case 0:
-		goto runit;
+				if (strcmp(argv[0], "test") == 0) {
+					do_in_cmd();	
+					return;
+				}
+                else {
+					goto runit;
+				}
             case 'w':
                 if (argc == MAXARGS) {
                     writef("too many arguments\n");
@@ -214,9 +234,9 @@ runcmd(char *s) {
 }
 
 void
-flush(char *buf) {
+flush(int len) {
     int i;
-    for (i = 0; i < strlen(buf); i++) writef("\b \b");
+    for (i = 0; i < len; i++) writef("\b \b");
 }
 
 void
@@ -236,12 +256,10 @@ readline(char *buf, u_int n) {
         if (i >= 2 && buf[i - 2] == 27 && buf[i - 1] == 91 && buf[i] == 65) { 
 			// Up arrow key
 			// Clean all the words in the current line
-			writef("%c%c%c", 27, 91, 66);
-			flush(buf);
-			i -= 2;
-			for (; i; i--) {
-				writef("\b");	
-			}
+			int cleanLen = strlen(buf) - 3;
+			writef("%c%c%c", 27, 91, 66);	// Keep the pointer at the bottom
+			flush(cleanLen);
+			
 			if (cmdi) 
 				strcpy(buf, cmds[--cmdi]);
             else 
@@ -250,11 +268,9 @@ readline(char *buf, u_int n) {
             i = strlen(buf) - 1;	// goto end
         } else if (i >= 2 && buf[i - 2] == 27 && buf[i - 1] == 91 && buf[i] == 66) { 
 			// Down arrow key
-			flush(buf);
-			i -= 2;
-			for (; i; i--) {
-				writef("\b");	
-			}
+			int cleanLen = strlen(buf) - 3;
+			flush(cleanLen);
+			
 			if (cmdi < cmdn - 1) {
                 strcpy(buf, cmds[++cmdi]);
                 writef("%s", buf);
@@ -279,7 +295,7 @@ readline(char *buf, u_int n) {
         if (buf[i] == '\b' || buf[i] == 127) {
             if (i > 0) {
                 buf[i] = 0;
-                flush(buf);
+                flush(strlen(buf));
                 buf[i - 1] = 0;
                 buf = strcat(buf, &buf[i]);
                 writef("%s", buf);
