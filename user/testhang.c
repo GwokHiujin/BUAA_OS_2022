@@ -9,22 +9,21 @@ int isprime(int n) {
     return 1;
 }
 
-void getAllPrime(int mlim) {
+void getAllPrime(int n) {
     int i = 2;
-    int checkpoint = mlim / 10;
-    for (; i <= mlim; i++) {
+    int checkpoint = n / 10;
+    for (; i <= n; i++) {
         if (i % checkpoint == 0) {
-            writef("@@@ i = %d @@@\n", i);
+            writef("\033[0m\033[1;32m@@@ Hey it is hanging @@@\n\033[0m");
         }
-        if (isprime(i)) ; 
-            // writef("@@@ %d is prime @@@\n", i);
+        if (isprime(i)) ;
     }
 }
 
 
 void umain() {
-    writef("@@ A slow program @@\n");
+    writef("\033[0m\033[1;31m--- Start to test a slow nohup program ---\n\033[0m");
     getAllPrime(100000);
-    writef("@@ Done! @@\n");
+    writef("\033[0m\033[1;31m--- The nohup progame has done! ---\n\033[0m");
     return;
 }
